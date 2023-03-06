@@ -24,8 +24,4 @@ mkdir -p ./artifacts
 
 dotnet restore Grpc.sln
 
-dotnet pack --configuration Release Grpc.Tools --output artifacts
-
-# Create a zipfile with all the nugets we just created
-cd artifacts
-zip csharp_nugets_windows_dotnetcli.zip *.nupkg
+dotnet pack --configuration Release Grpc.Tools --output artifacts 

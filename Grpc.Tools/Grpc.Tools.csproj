@@ -3,7 +3,7 @@
     <AssemblyName>Protobuf.MSBuild</AssemblyName>
     <VersionPrefix>$(GrpcCsharpVersion)</VersionPrefix>
     <!-- If changing targets, change also paths in Google.Protobuf.Tools.targets. -->
-    <TargetFrameworks>net45;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>net6.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
@@ -33,6 +33,8 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <PackageId>FsGrpc.Tools</PackageId>
+    
+    <IsPackable>true</IsPackable>
     <Authors>The gRPC Authors</Authors>
     <Copyright>Copyright 2018 The gRPC Authors</Copyright>
     <Description>gRPC and Protocol Buffer compiler for F# projects</Description>
@@ -41,6 +43,14 @@
     <PackageProjectUrl>https://github.com/grpc/grpc</PackageProjectUrl>
     <PackageTags>gRPC RPC HTTP/2</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <GenerateDependencyFile>true</GenerateDependencyFile>
+    	<!-- This target will run when MSBuild is collecting the files to be packaged, and we'll implement it below. This property controls the dependency list for this packaging process, so by adding our custom property we hook ourselves into the process in a supported way. -->
+    <TargetsForTfmSpecificBuildOutput>
+      $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage
+    </TargetsForTfmSpecificBuildOutput>
+    <!-- This property tells MSBuild where the root folder of the package's build assets should be. Because we are not a library package, we should not pack to 'lib'. Instead, we choose 'tasks' by convention. -->
+    <!-- NuGet does validation that libraries in a package are exposed as dependencies, but we _explicitly_ do not want that behavior for MSBuild tasks. They are isolated by design. Therefore we ignore this specific warning. -->
+    <NoWarn>NU5100</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -69,15 +79,36 @@
     <None Include="@(_Asset)" Pack="true" Visible="false" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <Reference Include="Microsoft.Build.Framework; Microsoft.Build.Utilities.v4.0" Pack="false" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net45' ">
-    <PackageReference Include="Microsoft.Build.Framework; Microsoft.Build.Utilities.Core" Version="15.6.*" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\fsgrpc\protoc-gen-fsgrpc\protoc-gen-fsgrpc.fsproj" PrivateAssets="All"/>
+    <PackageReference Include="Microsoft.Build.Framework; Microsoft.Build.Utilities.Core" Version="15.6.*" PrivateAssets="all" ExcludeAssets="Runtime" />
     <!--  Set PrivateAssets="All" on all items, even those implicitly added,
           so that they do not become dependencies of this package. -->
+    <PackageReference Update="FSharp.Core" PrivateAssets="all"/>
     <PackageReference Update="@(PackageReference)" PrivateAssets="All" />
   </ItemGroup>
 
+    <Target
+      Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput"
+      BeforeTargets="BuiltProjectOutputGroup"
+      Condition=" '$(GenerateDependencyFile)' == 'true'">
+
+    <ItemGroup>
+      <BuiltProjectOutputGroupOutput
+          Include="$(ProjectDepsFilePath)"
+          TargetPath="$(ProjectDepsFileName)"
+          FinalOutputPath="$(ProjectDepsFilePath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target
+      Name="CopyProjectReferencesToPackage"
+      DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <!-- the dependencies of your MSBuild task must be packaged inside the package, they cannot be expressed as normal PackageReferences -->
+      <BuildOutputInPackage
+          Include="@(ReferenceCopyLocalPaths)"
+          TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
+    </ItemGroup>
+  </Target>
 </Project>

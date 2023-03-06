@@ -8,14 +8,14 @@
     <!-- Configuration is passing the smoke test. -->
     <Protobuf_ProjectSupported Condition=" '$(Protobuf_Generator)' != '' ">true</Protobuf_ProjectSupported>
     <!-- Allow assembly file to be specified externally for testing by setting property _Protobuf_MsBuildAssembly -->
-    <_Protobuf_MsBuildAssembly Condition=" '$(_Protobuf_MsBuildAssembly)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">netstandard1.3\Protobuf.MSBuild.dll</_Protobuf_MsBuildAssembly>
-    <_Protobuf_MsBuildAssembly Condition=" '$(_Protobuf_MsBuildAssembly)' == '' and '$(MSBuildRuntimeType)' != 'Core' ">net45\Protobuf.MSBuild.dll</_Protobuf_MsBuildAssembly>
+    <_Protobuf_MsBuildAssembly Condition=" '$(_Protobuf_MsBuildAssembly)' == '' and '$(MSBuildRuntimeType)' == 'Core' ">net6.0\Protobuf.MSBuild.dll</_Protobuf_MsBuildAssembly>
   </PropertyGroup>
 
   <UsingTask AssemblyFile="$(_Protobuf_MsBuildAssembly)" TaskName="Grpc.Tools.ProtoToolsPlatform" />
   <UsingTask AssemblyFile="$(_Protobuf_MsBuildAssembly)" TaskName="Grpc.Tools.ProtoCompilerOutputs" />
   <UsingTask AssemblyFile="$(_Protobuf_MsBuildAssembly)" TaskName="Grpc.Tools.ProtoReadDependencies" />
   <UsingTask AssemblyFile="$(_Protobuf_MsBuildAssembly)" TaskName="Grpc.Tools.ProtoCompile" />
+  <UsingTask AssemblyFile="$(_Protobuf_MsBuildAssembly)" TaskName="Grpc.Tools.SortOutputFiles" />
 
   <PropertyGroup Condition=" '$(Protobuf_ProjectSupported)' == 'true' ">
     <Protobuf_IntermediatePath Condition=" '$(Protobuf_IntermediatePath)' == '' ">$(IntermediateOutputPath)</Protobuf_IntermediatePath>
@@ -191,7 +191,7 @@
        by default. This is controlled per-proto by the CompileOutputs metadata. -->
   <Target Name="Protobuf_PrepareCompile" Condition=" '@(Protobuf_Compile)' != '' ">
     <!-- Predict expected names. -->
-    <ProtoCompilerOutputs Condition=" '$(Language)' == 'C#' or '$(Language)' == 'F#' "
+    <ProtoCompilerOutputs Condition=" '$(Language)' == 'F#' "
                           Protobuf="@(Protobuf_Compile)"
                           Generator="$(Protobuf_Generator)">
       <Output TaskParameter="PossibleOutputs" ItemName="Protobuf_ExpectedOutputs" />
@@ -213,14 +213,21 @@
   <!-- Add all expected outputs, and only these, to language compile.  -->
   <Target Name="_Protobuf_AugmentLanguageCompile"
           DependsOnTargets="_Protobuf_EnforceInvariants"
-          Condition=" '$(Language)' == 'C#' or '$(Language)' == 'F#' ">
+          Condition=" '$(Language)' == 'F#' ">
     <ItemGroup>
-      <_Protobuf_CodeCompile Include="@(Protobuf_ExpectedOutputs->Distinct())"
+      <_Protobuf_CodeCompile Include="@(Protobuf_ExpectedOutputs)"
          Condition=" '%(Source)' != '' and '@(Protobuf_Compile->WithMetadataValue('CompileOutputs', 'true'))' != '' " />
-      <!-- Adding Distinct() is just a precaution as the CSC compiler complains if there are 
-           duplicate source files
-      -->
     </ItemGroup>
+
+    <ProtoReadDependencies Condition=" '$(Protobuf_DepFilesPath)' != '' and '$(DisableProtobufDesignTimeBuild)' != 'true' "
+                           Protobuf="@(_Protobuf_CodeCompile)"
+                           ProtoDepDir="$(Protobuf_DepFilesPath)" >
+      <Output TaskParameter="Dependencies" ItemName="_Protobuf_Dependencies" />
+    </ProtoReadDependencies>
+
+    <SortOutputFiles FilesToCompile="@(_Protobuf_CodeCompile)" Dependencies="@(_Protobuf_Dependencies)">
+      <Output TaskParameter="SortedFilesToCompile" ItemName="SortedFilesToCompile" />
+    </SortOutputFiles>
 
     <ItemGroup>
       <TempCompile Include="@(Compile)"></TempCompile>
@@ -231,7 +238,7 @@
       <Compile Remove="@(Compile)"/>
     </ItemGroup>
     <ItemGroup>
-      <Compile Include="@(_Protobuf_CodeCompile->Distinct())"/>
+      <Compile Include="@(SortedFilesToCompile)"/>
       <Compile Include="@(TempCompile)"/>
     </ItemGroup>
       

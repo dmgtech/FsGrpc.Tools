@@ -111,36 +111,6 @@ namespace Grpc.Tools.Tests
         }
 
         [Test]
-        public void GenerateGrpc()
-        {
-            _task.GrpcPluginExe = "/foo/grpcgen";
-            ExecuteExpectSuccess();
-            Assert.That(_task.LastResponseFile, Is.SupersetOf(new[] {
-                "--csharp_out=outdir", "--grpc_out=outdir",
-                "--plugin=protoc-gen-grpc=/foo/grpcgen" }));
-        }
-
-        [Test]
-        public void GenerateGrpcWithOutDir()
-        {
-            _task.GrpcPluginExe = "/foo/grpcgen";
-            _task.GrpcOutputDir = "gen-out";
-            ExecuteExpectSuccess();
-            Assert.That(_task.LastResponseFile, Is.SupersetOf(new[] {
-                "--csharp_out=outdir", "--grpc_out=gen-out" }));
-        }
-
-        [Test]
-        public void GenerateGrpcWithOptions()
-        {
-            _task.GrpcPluginExe = "/foo/grpcgen";
-            _task.GrpcOutputOptions = new[] { "baz", "quux" };
-            ExecuteExpectSuccess();
-            Assert.That(_task.LastResponseFile,
-                        Does.Contain("--grpc_opt=baz,quux"));
-        }
-
-        [Test]
         public void AdditionalProtocArguments()
         {
             _task.AdditionalProtocArguments = new[] { "--experimental_allow_proto3_optional" };
@@ -152,8 +122,6 @@ namespace Grpc.Tools.Tests
         [Test]
         public void DirectoryArgumentsSlashTrimmed()
         {
-            _task.GrpcPluginExe = "/foo/grpcgen";
-            _task.GrpcOutputDir = "gen-out/";
             _task.OutputDir = "outdir/";
             _task.ProtoPath = new[] { "/path1/", "/path2/" };
             ExecuteExpectSuccess();

@@ -212,7 +212,7 @@
 
   <!-- Add all expected outputs, and only these, to language compile.  -->
   <Target Name="_Protobuf_AugmentLanguageCompile"
-          DependsOnTargets="_Protobuf_EnforceInvariants"
+          DependsOnTargets="_Protobuf_CoreCompile"
           Condition=" '$(Language)' == 'F#' ">
     <ItemGroup>
       <_Protobuf_CodeCompile Include="@(Protobuf_ExpectedOutputs)"

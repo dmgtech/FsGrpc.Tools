@@ -57,7 +57,7 @@ namespace Grpc.Tools
                 var dependencies = new List<ITaskItem>();
                 foreach (var proto in Protobuf)
                 {
-                    string[] deps = DepFileUtil.ReadDependencyInputs(ProtoDepDir, proto.ItemSpec, Log);
+                    string[] deps = DepFileUtil.ReadDependencyInputs(ProtoDepDir, proto.GetMetadata(Metadata.Source), Log);
                     foreach (string dep in deps)
                     {
                         var ti = new TaskItem(dep);

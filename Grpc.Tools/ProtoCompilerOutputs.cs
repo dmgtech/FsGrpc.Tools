@@ -79,19 +79,16 @@ namespace Grpc.Tools
             var patched = new List<ITaskItem>();
             foreach (var proto in Protobuf)
             {
-                var patchedProto = generator.PatchOutputDirectory(proto);
-                patched.Add(patchedProto);
-
-                var outputs = generator.GetPossibleOutputs(patchedProto);
+                var outputs = generator.GetPossibleOutputs(proto);
                 foreach (string output in outputs)
                 {
                     var ti = new TaskItem(output);
-                    ti.SetMetadata(Metadata.Source, patchedProto.ItemSpec);
+                    ti.SetMetadata(Metadata.Source, proto.ItemSpec);
                     possible.Add(ti);
                 }
             }
 
-            PatchedProtobuf = patched.ToArray();
+            PatchedProtobuf = Protobuf;
             PossibleOutputs = possible.ToArray();
 
             return !Log.HasLoggedErrors;

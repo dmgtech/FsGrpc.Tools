@@ -41,41 +41,60 @@ namespace Grpc.Tools
         [Output]
         public ITaskItem[] SortedFilesToCompile { get; private set; }
 
+        public class Wrapper: IComparable<Wrapper>, IComparable
+        {
+            public ITaskItem Item{get;set;}
+            public Wrapper(ITaskItem taskItem)
+            {
+                Item = taskItem;
+            }
+
+            int IComparable<Wrapper>.CompareTo(Wrapper other)
+            {
+                return this.Item.ItemSpec.CompareTo(other.Item.ItemSpec);
+            }
+
+            public int CompareTo(object obj)
+            {
+                var otherObj = obj as Wrapper;
+                return (this as IComparable<Wrapper>).CompareTo(otherObj);
+            }
+        }
+
         public override bool Execute()
         {
-            //System.Diagnostics.Debugger.Launch();
-            var dependencyLookup = new Dictionary<string, List<TaskItem>>();
+            var dependencyLookup = new Dictionary<string, List<Wrapper>>();
 
             foreach(var file in Dependencies)
             {
-                var dep = new TaskItem(file);
-                //Log.LogWarning($"proto: {dep.GetMetadata(Metadata.Source)} dependency: {dep.ItemSpec}");
-                var fileName = dep.GetMetadata(Metadata.Source); //add .gen.fs ending
-                Log.LogWarning($"Source: {fileName}");
-                List<TaskItem> deps = null;
+                var dep = new Wrapper(new TaskItem(file));
+                var fileName = dep.Item.GetMetadata(Metadata.Source);
+
+                List<Wrapper> deps = null;
                 if(dependencyLookup.TryGetValue(fileName, out deps))
                 {
                     deps.Add(dep);
                 }
                 else
                 {
-                    dependencyLookup[fileName] = new List<TaskItem> { dep };
+                    dependencyLookup[fileName] = new List<Wrapper> { dep };
                 }
             }
 
-            Func<ITaskItem, IEnumerable<ITaskItem>> depLookup = input => {
-                //if(dependencyLookup.ContainsKey())
-                //{
-//
-                //}
-                //else
-                //{
-                     return new TaskItem[] {};
-                //}
+            Func<Wrapper, IEnumerable<Wrapper>> depLookup = input => {
+                var source = input.Item.ItemSpec;
+                foreach(var item in dependencyLookup)
+                {
+                    if(item.Key.Contains(source))
+                    {
+                        return item.Value;
+                    }
+                }
+                return new Wrapper[] {};
             };
             var sorter = DependencySort.depSort(depLookup);
 
-            SortedFilesToCompile = FilesToCompile.OrderBy(sorter).ToArray();
+            SortedFilesToCompile = FilesToCompile.Select(x=>new Wrapper(x)).OrderBy(sorter).Select(x=>x.Item).ToArray();
 
             return !Log.HasLoggedErrors;
         }

@@ -3,7 +3,6 @@
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <!-- We allow a non-C# generator be set by the user, but skip adding outputs to Compile in this case. -->
-    <Protobuf_Generator Condition=" '$(Protobuf_Generator)' == '' and '$(Language)' == 'C#' ">CSharp</Protobuf_Generator>
     <Protobuf_Generator Condition=" '$(Protobuf_Generator)' == '' and '$(Language)' == 'F#' ">fsgrpc</Protobuf_Generator>
     <!-- Configuration is passing the smoke test. -->
     <Protobuf_ProjectSupported Condition=" '$(Protobuf_Generator)' != '' ">true</Protobuf_ProjectSupported>
@@ -16,6 +15,7 @@
   <UsingTask AssemblyFile="$(_Protobuf_MsBuildAssembly)" TaskName="Grpc.Tools.ProtoReadDependencies" />
   <UsingTask AssemblyFile="$(_Protobuf_MsBuildAssembly)" TaskName="Grpc.Tools.ProtoCompile" />
   <UsingTask AssemblyFile="$(_Protobuf_MsBuildAssembly)" TaskName="Grpc.Tools.SortOutputFiles" />
+  <UsingTask AssemblyFile="$(_Protobuf_MsBuildAssembly)" TaskName="Grpc.Tools.ProtoReadDependenciesForClean" />
 
   <PropertyGroup Condition=" '$(Protobuf_ProjectSupported)' == 'true' ">
     <Protobuf_IntermediatePath Condition=" '$(Protobuf_IntermediatePath)' == '' ">$(IntermediateOutputPath)</Protobuf_IntermediatePath>
@@ -23,7 +23,7 @@
     <Protobuf_DepFilesPath Condition=" '$(Protobuf_DepFilesPath)' == '' ">$(Protobuf_IntermediatePath)</Protobuf_DepFilesPath>
   </PropertyGroup>
 
-  <ItemDefinitionGroup Condition=" '$(Protobuf_ProjectSupported)' == 'true' and ('$(Language)' == 'C#' or '$(Language)' == 'F#') ">
+  <ItemDefinitionGroup Condition=" '$(Protobuf_ProjectSupported)' == 'true' and '$(Language)' == 'F#' ">
     <Protobuf>
       <Access Condition="'%(Protobuf.Access)' == '' ">Public</Access>
       <ProtoCompile Condition="'%(Protobuf.ProtoCompile)' == '' ">True</ProtoCompile>
@@ -34,12 +34,12 @@
     </Protobuf>
   </ItemDefinitionGroup>
 
-  <ItemGroup Condition=" '$(Protobuf_ProjectSupported)' == 'true' and '$(Language)' == 'C#' ">
+  <!--ItemGroup Condition=" '$(Protobuf_ProjectSupported)' == 'true' and '$(Language)' == 'C#' ">
     <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Protobuf.CSharp.xml">
       <Context>File;BrowseObject</Context>
     </PropertyPageSchema>
     <AvailableItemName Include="Protobuf" />
-  </ItemGroup>
+  </ItemGroup-->
 
   <PropertyGroup>
     <!-- NET SDK: by default, do not include proto files in the directory.
@@ -110,7 +110,20 @@
 
   <!-- Extension points. -->
   <Target Name="Protobuf_BeforeCompile" />
-  <Target Name="Protobuf_AfterCompile" />
+  <Target Name="Protobuf_AfterCompile" DependsOnTargets="_Protobuf_CoreCompile" >
+
+    <ItemGroup>
+      <_Protobuf_Protodep Include="$(Protobuf_DepFilesPath)*.protodep" />
+    </ItemGroup>
+    <ProtoReadDependenciesForClean ProtoDepFiles="@(_Protobuf_Protodep)">
+      <Output TaskParameter="FilesToClean" ItemName="_FilesToClean" />
+    </ProtoReadDependenciesForClean>
+    <ItemGroup>
+      <_FilesToClean Remove="@(_Protobuf_GeneratedFiles)"/>
+    </ItemGroup>
+
+    <Delete Files="@(_FilesToClean)" TreatErrorsAsWarnings="true" />
+  </Target>
 
   <!-- Main compile sequence. Certain steps are gated by the value $(DisableProtobufDesignTimeBuild),
        so the sequence is good for either design time or build time. -->
@@ -122,21 +135,11 @@
                              Protobuf_PrepareCompile;
                              _Protobuf_AugmentLanguageCompile;
                              _Protobuf_CoreCompile;
-                             Protobuf_ReconcileOutputs;
-                             Protobuf_AfterCompile" />
-
-  <!-- Do proto compilation by default in a C# project. In other types, the user invoke
-       Protobuf_Compile directly where required. -->
-  <!-- TODO(kkm): Do shared compile in outer multitarget project? -->
-  <Target Name="_Protobuf_Compile_BeforeCsCompile"
-          BeforeTargets="BeforeCompile"
-          DependsOnTargets="Protobuf_Compile"
-          Condition=" '$(Language)' == 'C#' " />
+                             Protobuf_ReconcileOutputs " />
 
   <Target Name="_Protobuf_Compile_BeforeFsCompile"
           BeforeTargets="BeforeCompile"
-          DependsOnTargets="Protobuf_Compile"
-          Condition=" '$(Language)' == 'F#' " />
+          DependsOnTargets="Protobuf_Compile" />
 
   <Target Name="_Protobuf_SetProtoRoot">
     <!-- Guess .proto root for the files. Whenever the root is set for a file explicitly,
@@ -182,13 +185,7 @@
     </ItemGroup>
   </Target>
 
-  <!-- Extension point for non-C# project. Protobuf_Generator should be supported
-       by the ProtoCompile task, but we skip inferring expected outputs. All proto
-       files will be always recompiled with a warning, unless you add expectations
-       to the Protobuf_ExpectedOutputs collection.
-
-       All inferred ExpectedOutputs will be added to code compile (C#) in a C# project
-       by default. This is controlled per-proto by the CompileOutputs metadata. -->
+  <!-- All inferred ExpectedOutputs will be added to code compile. This is controlled per-proto by the CompileOutputs metadata. -->
   <Target Name="Protobuf_PrepareCompile" Condition=" '@(Protobuf_Compile)' != '' ">
     <!-- Predict expected names. -->
     <ProtoCompilerOutputs Condition=" '$(Language)' == 'F#' "
@@ -388,54 +385,35 @@
                                    Proto cleanup
    =================================================================================-->
 
-  <!-- We fully support cleanup only in a C# project. If extending the build for other
-       generators/plugins, then mostly roll your own. -->
-
-  <!-- Extension points. -->
-  <Target Name="Protobuf_BeforeClean" />
-  <Target Name="Protobuf_AfterClean" />
-
   <!-- Main cleanup sequence. -->
   <Target Name="Protobuf_Clean"
           Condition=" '@(Protobuf)' != '' "
-          DependsOnTargets=" Protobuf_BeforeClean;
-                             _Protobuf_SetProtoRoot;
+          DependsOnTargets=" _Protobuf_SetProtoRoot;
                              Protobuf_PrepareClean;
-                             _Protobuf_CoreClean;
-                             Protobuf_AfterClean" />
+                             _Protobuf_CoreClean" />
 
-  <!-- Do proto cleanup by default in a C# project. In other types, the user should
-       invoke Protobuf_Clean directly if required. -->
   <Target Name="_Protobuf_Clean_AfterCsClean"
           AfterTargets="CoreClean"
           DependsOnTargets="Protobuf_Clean"
-          Condition=" '$(Protobuf_ProjectSupported)' == 'true' and '$(Language)' == 'C#' " />
+          Condition=" '$(Protobuf_ProjectSupported)' == 'true'" />
 
-  <!-- Extension point for non-C# project. ProtoCompilerOutputs is not invoked for
-       non-C# projects, since inferring protoc outputs is required, so this is a
-       no-op in other project types. In your extension target populate the
-       Protobuf_ExpectedOutputs with all possible output. An option is to include
-       all existing outputs using Include with a wildcard, if you know where to look.
-
-       Note this is like Protobuf_PrepareCompile, but uses @(Protobuf_Rooted) regardless
+  <!-- Note this is like Protobuf_PrepareCompile, but uses @(Protobuf_Rooted) regardless
        of the Compile metadata, to remove all possible outputs. Plugins should err
        on the side of overextending the Protobuf_ExpectedOutputs here.
 
        All ExpectedOutputs will be removed. -->
   <Target Name="Protobuf_PrepareClean" Condition=" '@(Protobuf_Rooted)' != '' ">
     <!-- Predict expected names. -->
-    <ProtoCompilerOutputs Condition=" '$(Language)' == 'C#' "
-                          Protobuf="@(Protobuf_Rooted)"
-                          Generator="$(Protobuf_Generator)">
-      <Output TaskParameter="PossibleOutputs" ItemName="Protobuf_ExpectedOutputs" />
-    </ProtoCompilerOutputs>
-  </Target>
-
-  <Target Name="_Protobuf_CoreClean">
     <ItemGroup>
       <_Protobuf_Protodep Include="$(Protobuf_DepFilesPath)*.protodep" />
     </ItemGroup>
-    <Delete Files="@(Protobuf_ExpectedOutputs);@(_Protobuf_Protodep)" TreatErrorsAsWarnings="true" />
+    <ProtoReadDependenciesForClean ProtoDepFiles="@(_Protobuf_Protodep)">
+      <Output TaskParameter="FilesToClean" ItemName="_FilesToClean" />
+    </ProtoReadDependenciesForClean>
+  </Target>
+
+  <Target Name="_Protobuf_CoreClean">
+    <Delete Files="@(_FilesToClean);@(_Protobuf_Protodep)" TreatErrorsAsWarnings="true" />
   </Target>
 
   <!--================================================================================

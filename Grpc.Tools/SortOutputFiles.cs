@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System.Linq;
+using Medallion.Collections;
 
 namespace Grpc.Tools
 {
@@ -64,37 +65,36 @@ namespace Grpc.Tools
         public override bool Execute()
         {
             var dependencyLookup = new Dictionary<string, List<Wrapper>>();
-
+            var filesToCompile = FilesToCompile.Select(x=>new Wrapper(x)).ToArray();
             foreach(var file in Dependencies)
             {
-                var dep = new Wrapper(new TaskItem(file));
-                var fileName = dep.Item.GetMetadata(Metadata.Source);
-
-                List<Wrapper> deps = null;
-                if(dependencyLookup.TryGetValue(fileName, out deps))
-                {
-                    deps.Add(dep);
-                }
-                else
-                {
-                    dependencyLookup[fileName] = new List<Wrapper> { dep };
+                var fileName = file.GetMetadata(Metadata.Source);
+                var dep = filesToCompile.FirstOrDefault(x=>x.Item.ItemSpec.Contains(file.ItemSpec));
+                if(dep != null){
+                    List<Wrapper> deps = null;
+                    if(dependencyLookup.TryGetValue(fileName, out deps))
+                    {
+                        deps.Add(dep);
+                    }
+                    else
+                    {
+                        dependencyLookup[fileName] = new List<Wrapper> { dep };
+                    }
                 }
             }
 
             Func<Wrapper, IEnumerable<Wrapper>> depLookup = input => {
-                var source = input.Item.ItemSpec;
                 foreach(var item in dependencyLookup)
                 {
-                    if(item.Key.Contains(source))
+                    if(item.Key.Contains(input.Item.ItemSpec))
                     {
                         return item.Value;
                     }
                 }
                 return new Wrapper[] {};
             };
-            var sorter = DependencySort.depSort(depLookup);
-
-            SortedFilesToCompile = FilesToCompile.Select(x=>new Wrapper(x)).OrderBy(sorter).Select(x=>x.Item).ToArray();
+            
+            SortedFilesToCompile = filesToCompile.OrderTopologicallyBy(depLookup).Select(x=>x.Item).ToArray();
 
             return !Log.HasLoggedErrors;
         }

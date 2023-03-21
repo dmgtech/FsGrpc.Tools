@@ -28,7 +28,6 @@ namespace Grpc.Tools.Tests
         [SetUp]
         public new void SetUp()
         {
-            _task.Generator = "csharp";
             _task.OutputDir = "outdir";
             _task.Protobuf = Utils.MakeSimpleItems("a.proto");
         }
@@ -59,35 +58,6 @@ namespace Grpc.Tools.Tests
             ExecuteExpectSuccess();
             Assert.That(_task.LastResponseFile, Is.EqualTo(new[] {
                 "--csharp_out=outdir", "--error_format=msvs", "a.proto", "foo/b.proto" }));
-        }
-
-        [Test]
-        public void CompileWithProtoPaths()
-        {
-            _task.ProtoPath = new[] { "/path1", "/path2" };
-            ExecuteExpectSuccess();
-            Assert.That(_task.LastResponseFile, Is.EqualTo(new[] {
-                "--csharp_out=outdir", "--proto_path=/path1",
-                "--proto_path=/path2", "--error_format=msvs", "a.proto" }));
-        }
-
-        [TestCase("Cpp")]
-        [TestCase("CSharp")]
-        [TestCase("Java")]
-        [TestCase("Javanano")]
-        [TestCase("Js")]
-        [TestCase("Objc")]
-        [TestCase("Php")]
-        [TestCase("Python")]
-        [TestCase("Ruby")]
-        public void CompileWithOptions(string gen)
-        {
-            _task.Generator = gen;
-            _task.OutputOptions = new[] { "foo", "bar" };
-            ExecuteExpectSuccess();
-            gen = gen.ToLowerInvariant();
-            Assert.That(_task.LastResponseFile, Is.EqualTo(new[] {
-                $"--{gen}_out=outdir", $"--{gen}_opt=foo,bar", "--error_format=msvs", "a.proto" }));
         }
 
         [Test]

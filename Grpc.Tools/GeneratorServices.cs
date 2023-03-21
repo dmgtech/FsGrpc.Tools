@@ -30,30 +30,6 @@ namespace Grpc.Tools
         protected readonly TaskLoggingHelper Log;
         protected GeneratorServices(TaskLoggingHelper log) { Log = log; }
 
-        // Obtain a service for the given language (csharp, cpp).
-        public static GeneratorServices GetForLanguage(string lang, TaskLoggingHelper log)
-        {
-            if (lang.EqualNoCase("csharp") || lang.EqualNoCase("fsgrpc")) { return new CSharpGeneratorServices(log); }
-            if (lang.EqualNoCase("cpp")) { return new CppGeneratorServices(log); }
-
-            log.LogError("Invalid value '{0}' for task property 'Generator'. " +
-                "Supported generator languages: CSharp, Cpp.", lang);
-            return null;
-        }
-
-        // Guess whether item's metadata suggests gRPC stub generation.
-        // When "gRPCServices" is not defined, assume gRPC is not used.
-        // When defined, C# uses "none" to skip gRPC, C++ uses "false", so
-        // recognize both. Since the value is tightly coupled to the scripts,
-        // we do not try to validate the value; scripts take care of that.
-        // It is safe to assume that gRPC is requested for any other value.
-        protected bool GrpcOutputPossible(ITaskItem proto)
-        {
-            string gsm = proto.GetMetadata(Metadata.GrpcServices);
-            return !gsm.EqualNoCase("") && !gsm.EqualNoCase("none")
-                && !gsm.EqualNoCase("false");
-        }
-
         // Update OutputDir and GrpcOutputDir for the item and all subsequent
         // targets using this item. This should only be done if the real
         // output directories for protoc should be modified.
@@ -112,133 +88,19 @@ namespace Grpc.Tools
         }
     };
 
-    // C# generator services.
-    internal class CSharpGeneratorServices : GeneratorServices
+    internal class FSharpGeneratorServices : GeneratorServices
     {
-        public CSharpGeneratorServices(TaskLoggingHelper log) : base(log) { }
-
-        public override ITaskItem PatchOutputDirectory(ITaskItem protoItem)
-        {
-            //var outputItem = new TaskItem(protoItem);
-            //string root = outputItem.GetMetadata(Metadata.ProtoRoot);
-            //string proto = outputItem.ItemSpec;
-            //string relative = GetRelativeDir(root, proto, Log);
-
-            //string outdir = outputItem.GetMetadata(Metadata.OutputDir);
-            //string pathStem = Path.Combine(outdir, relative);
-            //outputItem.SetMetadata(Metadata.OutputDir, pathStem);
-            
-            //Log.LogWarning($"File path: proto {proto} stem {pathStem}");
-
-            // Override outdir if GrpcOutputDir present, default to proto output.
-            //string grpcdir = outputItem.GetMetadata(Metadata.GrpcOutputDir);
-            //if (grpcdir != "")
-            //{
-            //    pathStem = Path.Combine(grpcdir, relative);
-            //}
-            //outputItem.SetMetadata(Metadata.GrpcOutputDir, pathStem);
-            return protoItem;
-        }
+        public FSharpGeneratorServices(TaskLoggingHelper log) : base(log) { }
 
         public override string[] GetPossibleOutputs(ITaskItem protoItem)
         {
-            bool doGrpc = GrpcOutputPossible(protoItem);
-            var outputs = new string[doGrpc ? 2 : 1];
             string proto = protoItem.ItemSpec;
             string root = protoItem.GetMetadata(Metadata.ProtoRoot);
             string basename = Path.GetFileNameWithoutExtension(proto);
             string outdir = protoItem.GetMetadata(Metadata.OutputDir);
             string relative = GetRelativeDir(root, proto, Log);
             string pathStem = Path.Combine(outdir, relative);
-            //string filename = LowerUnderscoreToUpperCamelProtocWay(basename);
-            outputs[0] = Path.Combine(pathStem, basename) + ".proto.gen.fs";
-
-            if (doGrpc)
-            {
-                string grpcdir = protoItem.GetMetadata(Metadata.GrpcOutputDir);
-                //filename = LowerUnderscoreToUpperCamelGrpcWay(basename);
-                outputs[1] = Path.Combine(grpcdir, basename) + "Grpc.fs";
-            }
-            return outputs;
-        }
-
-        // This is how the gRPC codegen currently construct its output filename.
-        // See src/compiler/generator_helpers.h:118.
-        string LowerUnderscoreToUpperCamelGrpcWay(string str)
-        {
-            var result = new StringBuilder(str.Length, str.Length);
-            bool cap = true;
-            foreach (char c in str)
-            {
-                if (c == '_')
-                {
-                    cap = true;
-                }
-                else if (cap)
-                {
-                    result.Append(char.ToUpperInvariant(c));
-                    cap = false;
-                }
-                else
-                {
-                    result.Append(c);
-                }
-            }
-            return result.ToString();
-        }
-
-        // This is how the protoc codegen constructs its output filename.
-        // See protobuf/compiler/csharp/csharp_helpers.cc:137.
-        // Note that protoc explicitly discards non-ASCII letters.
-        string LowerUnderscoreToUpperCamelProtocWay(string str)
-        {
-            var result = new StringBuilder(str.Length, str.Length);
-            bool cap = true;
-            foreach (char c in str)
-            {
-                char upperC = char.ToUpperInvariant(c);
-                bool isAsciiLetter = 'A' <= upperC && upperC <= 'Z';
-                if (isAsciiLetter || ('0' <= c && c <= '9'))
-                {
-                    result.Append(cap ? upperC : c);
-                }
-                cap = !isAsciiLetter;
-            }
-            return result.ToString();
+            return new string[] { Path.Combine(pathStem, basename) + ".proto.gen.fs" };
         }
     };
-
-    // C++ generator services.
-    internal class CppGeneratorServices : GeneratorServices
-    {
-        public CppGeneratorServices(TaskLoggingHelper log) : base(log) { }
-
-        public override string[] GetPossibleOutputs(ITaskItem protoItem)
-        {
-            bool doGrpc = GrpcOutputPossible(protoItem);
-            string root = protoItem.GetMetadata(Metadata.ProtoRoot);
-            string proto = protoItem.ItemSpec;
-            string filename = Path.GetFileNameWithoutExtension(proto);
-            // E. g., ("foo/", "foo/bar/x.proto") => "bar"
-            string relative = GetRelativeDir(root, proto, Log);
-
-            var outputs = new string[doGrpc ? 4 : 2];
-            string outdir = protoItem.GetMetadata(Metadata.OutputDir);
-            string fileStem = Path.Combine(outdir, relative, filename);
-            outputs[0] = fileStem + ".pb.cc";
-            outputs[1] = fileStem + ".pb.h";
-            if (doGrpc)
-            {
-                // Override outdir if GrpcOutputDir present, default to proto output.
-                outdir = protoItem.GetMetadata(Metadata.GrpcOutputDir);
-                if (outdir != "")
-                {
-                    fileStem = Path.Combine(outdir, relative, filename);
-                }
-                outputs[2] = fileStem + ".grpc.pb.cc";
-                outputs[3] = fileStem + ".grpc.pb.h";
-            }
-            return outputs;
-        }
-    }
 }

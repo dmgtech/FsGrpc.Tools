@@ -122,9 +122,6 @@ namespace Grpc.Tools
                                       Each line corresponds to a single argument,
                                       even if it contains spaces.
         */
-        static string[] s_supportedGenerators = new[] { "cpp", "csharp", "java",
-                                                        "javanano", "js", "objc",
-                                                        "php", "python", "ruby", "fsgrpc" };
 
         static readonly TimeSpan s_regexTimeout = TimeSpan.FromMilliseconds(100);
 
@@ -288,12 +285,6 @@ namespace Grpc.Tools
         };
 
         /// <summary>
-        /// Code generator.
-        /// </summary>
-        [Required]
-        public string Generator { get; set; }
-
-        /// <summary>
         /// Protobuf files to compile.
         /// </summary>
         [Required]
@@ -380,14 +371,6 @@ namespace Grpc.Tools
         // Called by base class to validate arguments and make them consistent.
         protected override bool ValidateParameters()
         {
-            // Part of proto command line switches, must be lowercased.
-            Generator = Generator.ToLowerInvariant();
-            if (!System.Array.Exists(s_supportedGenerators, g => g == Generator))
-            {
-                Log.LogError("Invalid value for Generator='{0}'. Supported generators: {1}",
-                             Generator, string.Join(", ", s_supportedGenerators));
-            }
-
             if (ProtoDepDir != null && DependencyOut != null)
             {
                 Log.LogError("Properties ProtoDepDir and DependencyOut may not be both specified");
@@ -452,8 +435,8 @@ namespace Grpc.Tools
         protected override string GenerateResponseFileCommands()
         {
             var cmd = new ProtocResponseFileBuilder();
-            cmd.AddSwitchMaybe(Generator + "_out", TrimEndSlash(OutputDir));
-            cmd.AddSwitchMaybe(Generator + "_opt", OutputOptions);
+            cmd.AddSwitchMaybe("fsgrpc_out", TrimEndSlash(OutputDir));
+            cmd.AddSwitchMaybe("fsgrpc_opt", OutputOptions);
             cmd.AddSwitchMaybe("plugin=protoc-gen-fsgrpc", PluginExe);
 
             if (ProtoPath != null)

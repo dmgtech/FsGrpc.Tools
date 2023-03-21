@@ -25,12 +25,6 @@ namespace Grpc.Tools
     public class ProtoCompilerOutputs : Task
     {
         /// <summary>
-        /// Code generator. Currently supported are "csharp", "cpp" and "fsgrpc".
-        /// </summary>
-        [Required]
-        public string Generator { get; set; }
-
-        /// <summary>
         /// All Proto files in the project. The task computes possible outputs
         /// from these proto files, and returns them in the PossibleOutputs list.
         /// Not all of these might be actually produced by protoc; this is dealt
@@ -66,7 +60,7 @@ namespace Grpc.Tools
 
         public override bool Execute()
         {
-            var generator = GeneratorServices.GetForLanguage(Generator, Log);
+            var generator = new FSharpGeneratorServices(Log);
             if (generator == null)
             {
                 // Error already logged, just return.

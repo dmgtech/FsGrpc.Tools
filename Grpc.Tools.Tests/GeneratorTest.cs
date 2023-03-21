@@ -34,22 +34,5 @@ namespace Grpc.Tools.Tests
             _mockEngine = new Mock<IBuildEngine>();
             _log = new TaskLoggingHelper(_mockEngine.Object, "phony");
         }
-
-        [TestCase("csharp")]
-        [TestCase("CSharp")]
-        [TestCase("cpp")]
-        public void ValidLanguages(string lang)
-        {
-            Assert.IsNotNull(GeneratorServices.GetForLanguage(lang, _log));
-            _mockEngine.Verify(me => me.LogErrorEvent(It.IsAny<BuildErrorEventArgs>()), Times.Never);
-        }
-
-        [TestCase("")]
-        [TestCase("COBOL")]
-        public void InvalidLanguages(string lang)
-        {
-            Assert.IsNull(GeneratorServices.GetForLanguage(lang, _log));
-            _mockEngine.Verify(me => me.LogErrorEvent(It.IsAny<BuildErrorEventArgs>()), Times.Once);
-        }
     };
 }

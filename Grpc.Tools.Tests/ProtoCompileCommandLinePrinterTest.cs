@@ -27,7 +27,6 @@ namespace Grpc.Tools.Tests
         [SetUp]
         public new void SetUp()
         {
-            _task.Generator = "csharp";
             _task.OutputDir = "outdir";
             _task.Protobuf = Utils.MakeSimpleItems("a.proto");
 

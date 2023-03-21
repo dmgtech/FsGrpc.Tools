@@ -33,13 +33,6 @@
     </Protobuf>
   </ItemDefinitionGroup>
 
-  <!--ItemGroup Condition=" '$(Protobuf_ProjectSupported)' == 'true' and '$(Language)' == 'C#' ">
-    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)Protobuf.CSharp.xml">
-      <Context>File;BrowseObject</Context>
-    </PropertyPageSchema>
-    <AvailableItemName Include="Protobuf" />
-  </ItemGroup-->
-
   <PropertyGroup>
     <!-- NET SDK: by default, do not include proto files in the directory.
          Current Microsoft's recommendation is against globbing:
@@ -51,7 +44,7 @@
   <Target Name="_Protobuf_SanityCheck" BeforeTargets="PrepareForBuild">
     <Error
       Condition=" '$(Protobuf_ProjectSupported)' != 'true' "
-      Text="Google.Protobuf.Tools proto compilation is only supported by default in a C# project (extension .csproj)" />
+      Text="Google.Protobuf.Tools proto compilation is only supported by default in a F# project (extension .fsproj)" />
   </Target>
 
   <!--================================================================================
@@ -124,7 +117,7 @@
   <!-- Main compile sequence. Certain steps are gated by the value $(DisableProtobufDesignTimeBuild),
        so the sequence is good for either design time or build time. -->
   <Target Name="Protobuf_Compile"
-          Condition=" '@(Protobuf)' != '' "
+          Condition=" '@(Protobuf)' != '' and '$(Language)' == 'F#' "
           DependsOnTargets=" Protobuf_BeforeCompile;
                              Protobuf_ResolvePlatform;
                              _Protobuf_SelectFiles;
@@ -185,9 +178,7 @@
   <!-- All inferred ExpectedOutputs will be added to code compile. This is controlled per-proto by the CompileOutputs metadata. -->
   <Target Name="Protobuf_PrepareCompile" Condition=" '@(Protobuf_Compile)' != '' ">
     <!-- Predict expected names. -->
-    <ProtoCompilerOutputs Condition=" '$(Language)' == 'F#' "
-                          Protobuf="@(Protobuf_Compile)"
-                          Generator="$(Protobuf_Generator)">
+    <ProtoCompilerOutputs Protobuf="@(Protobuf_Compile)">
       <Output TaskParameter="PossibleOutputs" ItemName="Protobuf_ExpectedOutputs" />
       <Output TaskParameter="PatchedProtobuf" ItemName="_PatchedProtobuf" />
     </ProtoCompilerOutputs>
@@ -206,8 +197,7 @@
 
   <!-- Add all expected outputs, and only these, to language compile.  -->
   <Target Name="_Protobuf_AugmentLanguageCompile"
-          DependsOnTargets="_Protobuf_CoreCompile"
-          Condition=" '$(Language)' == 'F#' ">
+          DependsOnTargets="_Protobuf_CoreCompile">
     <ItemGroup>
       <_Protobuf_CodeCompile Include="@(Protobuf_ExpectedOutputs)"
          Condition=" '%(Source)' != '' and '@(Protobuf_Compile->WithMetadataValue('CompileOutputs', 'true'))' != '' " />
@@ -328,7 +318,6 @@
 
     <ProtoCompile Condition=" '@(_Protobuf_OutOfDateProto)' != '' "
       ToolExe="$(Protobuf_ProtocFullPath)"
-      Generator="$(Protobuf_Generator)"
       Protobuf="%(_Protobuf_OutOfDateProto.Source)"
       ProtoPath="%(_Protobuf_OutOfDateProto.AdditionalImportDirs);$(Protobuf_StandardImportsPath);%(_Protobuf_OutOfDateProto.ProtoRoot)"
       ProtoDepDir="$(Protobuf_DepFilesPath)"

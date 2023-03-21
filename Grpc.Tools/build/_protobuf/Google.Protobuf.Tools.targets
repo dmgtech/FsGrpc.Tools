@@ -115,7 +115,7 @@
     </ItemGroup>
     <ItemGroup>
       <_FilesToClean Include="$(Protobuf_OutputPath)**\*.proto.gen.fs" />
-      <_FilesToClean Remove="@(_Protobuf_GeneratedFiles)"/>
+      <_FilesToClean Remove="@(Protobuf_ExpectedOutputs)"/>
     </ItemGroup>
 
     <Delete Files="@(_FilesToClean)" TreatErrorsAsWarnings="true" />

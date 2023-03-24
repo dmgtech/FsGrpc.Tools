@@ -16,3 +16,4 @@ TestResult.xml
 coverage_results.xml
 /TestResults
 /test-out/
+/artifacts

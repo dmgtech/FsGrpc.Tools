@@ -22,6 +22,6 @@ mkdir -p ./artifacts
 # Add current timestamp to dev nugets
 ./nuget_helpers/expand_dev_version.sh
 
-dotnet restore Grpc.sln --packages=packages
+dotnet restore FsGrpc.Tools --packages=packages
 
-dotnet pack --configuration Release Grpc.Tools --output artifacts
+dotnet pack --configuration Release FsGrpc.Tools --output artifacts

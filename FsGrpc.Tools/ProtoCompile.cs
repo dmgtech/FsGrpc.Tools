@@ -438,6 +438,7 @@ namespace Grpc.Tools
             cmd.AddSwitchMaybe("fsgrpc_out", TrimEndSlash(OutputDir));
             cmd.AddSwitchMaybe("fsgrpc_opt", OutputOptions);
             cmd.AddSwitchMaybe("plugin=protoc-gen-fsgrpc", PluginExe);
+            //Log.LogError($"Plugin Path: {PluginExe}");
 
             if (ProtoPath != null)
             {

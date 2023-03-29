@@ -31,7 +31,6 @@
     <!-- TODO(kkm): Change to "build\" after splitting. -->
     <BuildOutputTargetFolder>build\_protobuf\</BuildOutputTargetFolder>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
     <PackageId>FsGrpc.Tools</PackageId>
     
     <IsPackable>true</IsPackable>
@@ -46,7 +45,7 @@
 	  <GenerateDependencyFile>true</GenerateDependencyFile>
     <!-- This property tells MSBuild where the root folder of the package's build assets should be. Because we are not a library package, we should not pack to 'lib'. Instead, we choose 'tasks' by convention. -->
     <!-- NuGet does validation that libraries in a package are exposed as dependencies, but we _explicitly_ do not want that behavior for MSBuild tasks. They are isolated by design. Therefore we ignore this specific warning. -->
-    <NoWarn>NU5100</NoWarn>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -62,9 +61,6 @@
                               source_context;struct;timestamp;type;wrappers" />
     <_Asset PackagePath="build/native/include/google/protobuf/" Include="@(_ProtoAssetName->'$(Assets_ProtoInclude)%(Identity).proto')" />
 
-    <!-- TODO(kkm): GPB builds assets into "macosx", GRPC into "macos". -->
-    <!-- TODO(kkm): Do not place non-tools under tools/, use build/native/bin/. -->
-    <!-- TODO(kkm): Do not package windows x64 builds (#13098). -->
     <_Asset PackagePath="tools/windows_x86/" Include="$(Assets_ProtoCompiler)windows_x86/protoc.exe" />
     <_Asset PackagePath="tools/windows_x64/" Include="$(Assets_ProtoCompiler)windows_x64/protoc.exe" />
     <_Asset PackagePath="tools/linux_x86/" Include="$(Assets_ProtoCompiler)linux_x86/protoc" />
@@ -78,12 +74,13 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework; Microsoft.Build.Utilities.Core" Version="15.6.*" PrivateAssets="all" ExcludeAssets="Runtime" />
     <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="FsGrpc.ProtocGenFsGrpc" Version="1.0.2" PrivateAssets="All" />
+
+    <PackageReference Include="fsgrpc" Version="1.*" />
+    <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.52.0" />
     
     <None Include="$(OutputPath)\net6.0\$(AssemblyName).deps.json" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
     <None Include="$(OutputPath)\net6.0\$(AssemblyName).dll" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
-    <None Include="..\packages\medalliontopologicalsort\1.0.0\lib\netstandard2.0\MedallionTopologicalSort.dll" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
-
-    <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.52.0" />
-    <PackageReference Include="fsgrpc" Version="1.0.2" />
+    <None Include="$(NugetPackageRoot)\medalliontopologicalsort\1.0.0\lib\netstandard2.0\MedallionTopologicalSort.dll" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
   </ItemGroup>
 </Project>

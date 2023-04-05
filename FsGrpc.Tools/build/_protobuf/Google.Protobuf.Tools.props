@@ -6,7 +6,6 @@
     <!-- Revision number of this package conventions (as if "API" version). -->
     <Protobuf_ToolingRevision>1</Protobuf_ToolingRevision>
 
-    <!-- TODO(kkm): Remove one "../" when separating packages. -->
     <!-- TODO(kkm): Do not place non-tools under tools/, use build/native/bin/. -->
     <Protobuf_PackagedToolsPath>$( [System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)../../tools) )</Protobuf_PackagedToolsPath>
     <Protobuf_StandardImportsPath>$( [System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)../native/include) )</Protobuf_StandardImportsPath>
@@ -21,19 +20,4 @@
     <Protobuf Include="**/*.proto"
               Condition=" '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultProtobufItems)' == 'true' " />
   </ItemGroup>
-
-  <Target Name="ResolvePluginFullPath" AfterTargets="Protobuf_ResolvePlatform">
-    <PropertyGroup>
-      <!-- TODO(kkm): Do not use Protobuf_PackagedToolsPath, roll gRPC's own. -->
-
-      <!-- First try environment variable. -->
-      <gRPC_PluginFullPath Condition=" '$(gRPC_PluginFullPath)' == '' ">$(GRPC_PROTOC_PLUGIN)</gRPC_PluginFullPath>
-
-      <gRPC_PluginFullPath Condition=" '$(gRPC_PluginFullPath)' == '' and '$(Protobuf_ToolsOs)' == 'windows' "
-           >$(Protobuf_PackagedToolsPath)\$(Protobuf_ToolsOs)_$(Protobuf_ToolsCpu)\$(gRPC_PluginFileName).exe</gRPC_PluginFullPath>
-      <gRPC_PluginFullPath Condition=" '$(gRPC_PluginFullPath)' == '' "
-           >$(Protobuf_PackagedToolsPath)/$(Protobuf_ToolsOs)_$(Protobuf_ToolsCpu)/$(gRPC_PluginFileName)</gRPC_PluginFullPath>
-    </PropertyGroup>
-  </Target>
-
 </Project>

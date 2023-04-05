@@ -1,6 +1,6 @@
 curl 'https://www.nuget.org/api/v2/package/Grpc.Tools/2.51.0' -L -o /tmp/Grpc.Tools.zip -s
 
-cd $(dirname $0)/../protoc_plugins
+cd protoc_plugins
 
 mkdir -p protoc_windows_x86
 mkdir -p protoc_windows_x64

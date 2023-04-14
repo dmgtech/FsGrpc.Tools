@@ -9,7 +9,6 @@ obj/
 *.nupkg
 StyleCop.Cache
 /packages/
-/protoc_plugins/
 
 test-results/
 TestResult.xml

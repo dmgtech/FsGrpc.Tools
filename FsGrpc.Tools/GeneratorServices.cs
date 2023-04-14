@@ -25,7 +25,7 @@ namespace Grpc.Tools
 {
     // Abstract class for language-specific analysis behavior, such
     // as guessing the generated files the same way protoc does.
-    internal abstract class GeneratorServices
+    public abstract class GeneratorServices
     {
         protected readonly TaskLoggingHelper Log;
         protected GeneratorServices(TaskLoggingHelper log) { Log = log; }
@@ -88,7 +88,7 @@ namespace Grpc.Tools
         }
     };
 
-    internal class FSharpGeneratorServices : GeneratorServices
+    public class FSharpGeneratorServices : GeneratorServices
     {
         public FSharpGeneratorServices(TaskLoggingHelper log) : base(log) { }
 
@@ -96,11 +96,11 @@ namespace Grpc.Tools
         {
             string proto = protoItem.ItemSpec;
             string root = protoItem.GetMetadata(Metadata.ProtoRoot);
-            string basename = Path.GetFileNameWithoutExtension(proto);
+            string filename = Path.GetFileNameWithoutExtension(proto);
             string outdir = protoItem.GetMetadata(Metadata.OutputDir);
             string relative = GetRelativeDir(root, proto, Log);
-            string pathStem = Path.Combine(outdir, relative);
-            return new string[] { Path.Combine(pathStem, basename) + ".proto.gen.fs" };
+            string pathStem = Path.Combine(outdir, relative, filename);
+            return new string[] { pathStem + ".proto.gen.fs" };
         }
     };
 }

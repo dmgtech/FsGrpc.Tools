@@ -1,0 +1,31 @@
+name: dotnet package
+
+on:
+  pull_request:
+      branches:
+        - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet-version: ['6.0.x']
+    defaults:
+      run:
+        working-directory: ./FsGrpc
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v2.0.0
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Display version
+        run: dotnet --version
+      - name: Gather projects
+        run: rm -f fsgrpc.tools-ci.sln && dotnet new sln -n fsgrpc.tools-ci && dotnet sln fsgrpc.tools-ci.sln add `find . -type f -name '*.fsproj'` --in-root
+      - name: Install dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+      - name: Test
+        run: dotnet test --configuration Release --no-restore --verbosity normal

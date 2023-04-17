@@ -12,7 +12,7 @@ jobs:
         dotnet-version: ['6.0.x']
     defaults:
       run:
-        working-directory: ./FsGrpc
+        working-directory: ./FsGrpc.Tools
     steps:
       - uses: actions/checkout@v2
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}

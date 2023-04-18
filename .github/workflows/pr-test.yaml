@@ -22,7 +22,7 @@ jobs:
       - name: Display version
         run: dotnet --version
       - name: Gather projects
-        run: rm -f fsgrpc.tools-ci.sln && dotnet new sln -n fsgrpc.tools-ci && dotnet sln fsgrpc.tools-ci.sln add `find . -type f -name '*.fsproj'` --in-root
+        run: rm -f fsgrpc.tools-ci.sln && dotnet new sln -n fsgrpc.tools-ci && dotnet sln fsgrpc.tools-ci.sln add `find . -type f -name '*.csproj'` --in-root
       - name: Install dependencies
         run: dotnet restore
       - name: Build

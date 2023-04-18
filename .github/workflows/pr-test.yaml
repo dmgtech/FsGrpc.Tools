@@ -10,9 +10,6 @@ jobs:
     strategy:
       matrix:
         dotnet-version: ['6.0.x']
-    defaults:
-      run:
-        working-directory: ./FsGrpc.Tools
     steps:
       - uses: actions/checkout@v2
       - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
@@ -24,7 +21,7 @@ jobs:
       - name: Gather projects
         run: rm -f fsgrpc.tools-ci.sln && dotnet new sln -n fsgrpc.tools-ci && dotnet sln fsgrpc.tools-ci.sln add `find . -type f -name '*.csproj'` --in-root
       - name: Install dependencies
-        run: dotnet restore
+        run: dotnet restore fsgrpc.tools-ci.sln
       - name: Build
         run: dotnet build --configuration Release --no-restore
       - name: Test

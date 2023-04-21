@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Grpc.Tools.Tests/Grpc.Tools.Tests.csproj",
+                "${workspaceFolder}/FsGrpc.Tools.Tests/FsGrpc.Tools.Tests.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Grpc.Tools.Tests/Grpc.Tools.Tests.csproj",
+                "${workspaceFolder}/FsGrpc.Tools.Tests/FsGrpc.Tools.Tests.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/Grpc.Tools.Tests/Grpc.Tools.Tests.csproj"
+                "${workspaceFolder}/FsGrpc.Tools.Tests/FsGrpc.Tools.Tests.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

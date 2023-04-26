@@ -26,10 +26,6 @@ jobs:
         run: dotnet restore
       - name: Build
         run: dotnet build --configuration Release --no-restore
-      - name: Publish
-        env:
-          FSGRPCTOOLS_VERSION: ${{github.ref_name}}
-        run: dotnet publish -p:FSGRPCTOOLS_VERSION=${FSGRPCTOOLS_VERSION#v} --no-restore --no-build --configuration Release
       - name: Package
         env:
           FSGRPCTOOLS_VERSION: ${{github.ref_name}}

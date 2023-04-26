@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <AssemblyName>Protobuf.MSBuild</AssemblyName>
-    <VersionPrefix>$(GrpcCsharpVersion)</VersionPrefix>
+    <VersionPrefix>$(FSGRPCTOOLS_VERSION)$(VersionSuffix)</VersionPrefix>
     <!-- If changing targets, change also paths in Google.Protobuf.Tools.targets. -->
     <TargetFrameworks>net6.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -74,14 +74,14 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework; Microsoft.Build.Utilities.Core" Version="15.6.*" PrivateAssets="all" ExcludeAssets="Runtime" />
     <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="FsGrpc.ProtocGenFsGrpc" Version="1.0.3" PrivateAssets="All" />
+    <PackageReference Include="FsGrpc.ProtocGenFsGrpc" Version="0.5.3" PrivateAssets="All" />
 
-    <PackageReference Include="fsgrpc" Version="1.*" />
+    <PackageReference Include="fsgrpc" Version="1.0.3" />
     <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.52.0" />
     
     <None Include="$(OutputPath)\net6.0\$(AssemblyName).deps.json" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
     <None Include="$(OutputPath)\net6.0\$(AssemblyName).dll" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
     <None Include="$(NugetPackageRoot)\medalliontopologicalsort\1.0.0\lib\netstandard2.0\MedallionTopologicalSort.dll" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
-    <None Include="$(NugetPackageRoot)\fsgrpc.protocgenfsgrpc\1.0.3\tools\**\*" Pack="true" PackagePath="tools\" Visible="false" />
+    <None Include="$(NugetPackageRoot)\fsgrpc.protocgenfsgrpc\0.5.3\tools\**\*" Pack="true" PackagePath="tools\" Visible="false" />
   </ItemGroup>
 </Project>

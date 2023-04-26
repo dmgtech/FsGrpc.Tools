@@ -23,7 +23,7 @@ namespace Grpc.Tools.Tests
 {
     public class CSharpGeneratorTest
     {
-        GeneratorServices _generator;
+        FSharpGeneratorServices _generator;
         protected TaskLoggingHelper _log;
 
         [SetUp]
@@ -45,8 +45,7 @@ namespace Grpc.Tools.Tests
         public void OutputDirPatched()
         {
             var item = Utils.MakeItem("sub/foo.proto", "OutputDir", "out");
-            var output = _generator.PatchOutputDirectory(item);
-            var poss = _generator.GetPossibleOutputs(output);
+            var poss = _generator.GetPossibleOutputs(item);
             Assert.AreEqual(1, poss.Length);
             Assert.That(poss[0], Is.EqualTo("out/sub/foo.proto.gen.fs") | Is.EqualTo("out\\sub\\foo.proto.gen.fs"));
         }
@@ -55,14 +54,13 @@ namespace Grpc.Tools.Tests
         public void OutputDirOutsideBuildDirectory()
         {
             var item = Utils.MakeItem(
-                @"C:\Users\mciccotti\.nuget\packages\fsgrpc.tools\1.0.0\build\native\include\google\protobuf\descriptor.proto",
-                "OutputDir", @"obj\Debug\net7.0\",
-                "ProtoRoot", @"C:\Users\mciccotti\.nuget\packages\fsgrpc.tools\1.0.0\build\native\include\google\protobuf\"
+                @"C:\Users\mciccotti\.nuget\packages\fsgrpc.tools\1.0.0\build\native\include\google\protobuf\descriptor.proto".Replace('\\', System.IO.Path.DirectorySeparatorChar),
+                "OutputDir", @"obj\Debug\net7.0".Replace('\\', System.IO.Path.DirectorySeparatorChar),
+                "ProtoRoot", @"C:\Users\mciccotti\.nuget\packages\fsgrpc.tools\1.0.0\build\native\include\google\protobuf\".Replace('\\', System.IO.Path.DirectorySeparatorChar)
                 );
-            var output = _generator.PatchOutputDirectory(item);
-            var poss = _generator.GetPossibleOutputs(output);
+            var poss = _generator.GetPossibleOutputs(item);
             Assert.AreEqual(1, poss.Length);
-            Assert.That(poss[0], Is.EqualTo("out/sub/foo.proto.gen.fs") | Is.EqualTo("out\\sub\\foo.proto.gen.fs"));
+            Assert.That(poss[0], Is.EqualTo("obj/Debug/net7.0/descriptor.proto.gen.fs") | Is.EqualTo("obj\\Debug\\net7.0\\descriptor.proto.gen.fs"));
         }
     };
 }

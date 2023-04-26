@@ -25,7 +25,7 @@ using Microsoft.Build.Utilities;
 
 namespace Grpc.Tools
 {
-    internal static class DepFileUtil
+    public static class DepFileUtil
     {
         /*
            Sample dependency files. Notable features we have to deal with:
@@ -211,7 +211,7 @@ namespace Grpc.Tools
         // unique, since there are not so many distinct proto paths in a project.
         // We take the first 64 bit of the string SHA1.
         // Internal for tests access only.
-        internal static string HashString64Hex(string str)
+        public static string HashString64Hex(string str)
         {
             using (var sha1 = System.Security.Cryptography.SHA1.Create())
             {

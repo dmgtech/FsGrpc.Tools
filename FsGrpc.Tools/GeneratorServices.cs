@@ -30,15 +30,6 @@ namespace Grpc.Tools
         protected readonly TaskLoggingHelper Log;
         protected GeneratorServices(TaskLoggingHelper log) { Log = log; }
 
-        // Update OutputDir and GrpcOutputDir for the item and all subsequent
-        // targets using this item. This should only be done if the real
-        // output directories for protoc should be modified.
-        public virtual ITaskItem PatchOutputDirectory(ITaskItem protoItem)
-        {
-            // Nothing to do
-            return protoItem;
-        }
-
         public abstract string[] GetPossibleOutputs(ITaskItem protoItem);
 
         // Calculate part of proto path relative to root. Protoc is very picky

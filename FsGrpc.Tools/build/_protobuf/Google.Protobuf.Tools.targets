@@ -201,19 +201,8 @@
     </SortOutputFiles>
 
     <ItemGroup>
-      <TempCompile Include="@(Compile)"></TempCompile>
+      <CompileBefore Include="@(SortedFilesToCompile)"/>
     </ItemGroup>
-
-    <!-- Clear the Compile ItemGroup-->
-    <ItemGroup>
-      <Compile Remove="@(Compile)"/>
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Include="@(SortedFilesToCompile)"/>
-      <Compile Include="@(TempCompile)"/>
-    </ItemGroup>
-      
-      <!--Compile Include="@(_Protobuf_CodeCompile->Distinct())" /-->
   </Target>
 
   <!-- These invariants must be kept for compile up-to-date check to work. -->

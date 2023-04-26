@@ -62,7 +62,7 @@ namespace Grpc.Tools.Tests
             var output = _generator.PatchOutputDirectory(item);
             var poss = _generator.GetPossibleOutputs(output);
             Assert.AreEqual(1, poss.Length);
-            Assert.That(poss[0], Is.EqualTo("out/sub/foo.proto.gen.fs") | Is.EqualTo("out\\sub\\foo.proto.gen.fs"));
+            Assert.That(poss[0], Is.EqualTo("obj/Debug/net7.0/descriptor.proto.gen.fs") | Is.EqualTo("obj\\Debug\\net7.0\\descriptor.proto.gen.fs"));
         }
     };
 }

@@ -15,7 +15,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.4.2" />
     <PackageReference Include="NUnit; NUnitLite" Version="3.10.1" />
     <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
-    <PackageReference Include="fsgrpc" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup>

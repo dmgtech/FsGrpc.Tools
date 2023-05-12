@@ -77,6 +77,7 @@
     <PackageReference Include="FsGrpc.ProtocGenFsGrpc" Version="0.5.4" PrivateAssets="All" />
 
     <PackageReference Include="fsgrpc" Version="1.0.5" />
+    <PackageReference Include="Focal.Core" Version="0.9.2" />
     <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.52.0" />
     
     <None Include="$(OutputPath)\net6.0\$(AssemblyName).deps.json" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />

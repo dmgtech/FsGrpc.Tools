@@ -2,7 +2,8 @@ name: dotnet package
 
 on:
   pull_request:
-
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest

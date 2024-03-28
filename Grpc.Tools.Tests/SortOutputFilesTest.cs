@@ -33,8 +33,8 @@ namespace Grpc.Tools.Tests
                     Dependencies = dependencies
                 };
             sorter.Execute();
-            
-            Assert.AreEqual(2, sorter.SortedFilesToCompile.Length);
+
+            Assert.That(2, Is.EqualTo(sorter.SortedFilesToCompile.Length));
         }
         [Test]
         public void ResolvesLocalDependency()
@@ -64,8 +64,8 @@ namespace Grpc.Tools.Tests
                     Dependencies = dependencies
                 };
             sorter.Execute();
-            
-            Assert.AreEqual(2, sorter.SortedFilesToCompile.Length);
+
+            Assert.That(2, Is.EqualTo(sorter.SortedFilesToCompile.Length));
         }
     };
 }

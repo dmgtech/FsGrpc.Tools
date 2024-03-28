@@ -86,5 +86,3 @@
     <None Include="$(NugetPackageRoot)\fsgrpc.protocgenfsgrpc\0.5.4\tools\**\*" Pack="true" PackagePath="tools\" Visible="false" />
   </ItemGroup>
 </Project>
-
-<!--dotnet build -c Release && dotnet publish -p:FSGRPCTOOLS_VERSION=99.0.0  -c Release && dotnet pack -p:FSGRPCTOOLS_VERSION=99.0.0 -c Release && mv bin/Release/FsGrpc.Tools.99.0.0.nupkg ../../pkgs/ -->

@@ -83,6 +83,6 @@
     <None Include="$(OutputPath)\$(AssemblyName).deps.json" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
     <None Include="$(NugetPackageRoot)\medalliontopologicalsort\1.0.0\lib\netstandard2.0\MedallionTopologicalSort.dll" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
-    <None Include="$(NugetPackageRoot)\fsgrpc.protocgenfsgrpc\0.5.4\tools\**\*" Pack="true" PackagePath="tools\" Visible="false" />
+    <None Include="$(NugetPackageRoot)\fsgrpc.protocgenfsgrpc\0.6.0\tools\**\*" Pack="true" PackagePath="tools\" Visible="false" />
   </ItemGroup>
 </Project>

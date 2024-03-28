@@ -20,6 +20,7 @@ using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using NUnit.Framework;
+using NUnit.Framework.Legacy;
 
 namespace Grpc.Tools.Tests
 {
@@ -34,8 +35,8 @@ namespace Grpc.Tools.Tests
             string hashFoo2 = DepFileUtil.HashString64Hex("foo");
 
             StringAssert.IsMatch("^[a-f0-9]{16}$", hashFoo1);
-            Assert.AreEqual(hashFoo1, hashFoo2);
-            Assert.AreNotEqual(hashFoo1, hashEmpty);
+            Assert.That(hashFoo1, Is.EqualTo(hashFoo2));
+            Assert.That(hashFoo1, Is.Not.EqualTo(hashEmpty));
         }
 
         [Test]
@@ -60,11 +61,11 @@ namespace Grpc.Tools.Tests
             string unsame1 = PickHash("dir2/foo.proto");
             string unsame2 = PickHash("/dir2/foo.proto");
 
-            Assert.AreEqual(same1, same2);
-            Assert.AreEqual(same1, same3);
-            Assert.AreEqual(same1, same4);
-            Assert.AreNotEqual(same1, unsame1);
-            Assert.AreNotEqual(unsame1, unsame2);
+            Assert.That(same1, Is.EqualTo(same2));
+            Assert.That(same1, Is.EqualTo(same3));
+            Assert.That(same1, Is.EqualTo(same4));
+            Assert.That(same1, Is.Not.EqualTo(unsame1));
+            Assert.That(unsame1, Is.Not.EqualTo(unsame2));
         }
 
         [Test]
@@ -88,11 +89,11 @@ namespace Grpc.Tools.Tests
             string unsame1 = PickHash("dir2/foo.proto");
             string unsame2 = PickHash("/dir2/foo.proto");
 
-            Assert.AreEqual(same1, same2);
-            Assert.AreEqual(same1, same3);
-            Assert.AreEqual(same1, same4);
-            Assert.AreNotEqual(same1, unsame1);
-            Assert.AreNotEqual(unsame1, unsame2);
+            Assert.That(same1, Is.EqualTo(same2));
+            Assert.That(same1, Is.EqualTo(same3));
+            Assert.That(same1, Is.EqualTo(same4));
+            Assert.That(same1, Is.Not.EqualTo(unsame1));
+            Assert.That(unsame1, Is.Not.EqualTo(unsame2));
         }
     };
 }

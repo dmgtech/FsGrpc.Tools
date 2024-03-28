@@ -37,7 +37,7 @@ namespace Grpc.Tools.Tests
         {
             var item = Utils.MakeItem("foo.proto", "OutputDir", "out");
             var poss = _generator.GetPossibleOutputs(item);
-            Assert.AreEqual(1, poss.Length);
+            Assert.That(1, Is.EqualTo(poss.Length));
             Assert.That(poss[0], Is.EqualTo("out/foo.proto.gen.fs") | Is.EqualTo("out\\foo.proto.gen.fs"));
         }
 
@@ -46,7 +46,7 @@ namespace Grpc.Tools.Tests
         {
             var item = Utils.MakeItem("sub/foo.proto", "OutputDir", "out");
             var poss = _generator.GetPossibleOutputs(item);
-            Assert.AreEqual(1, poss.Length);
+            Assert.That(1, Is.EqualTo(poss.Length));
             Assert.That(poss[0], Is.EqualTo("out/sub/foo.proto.gen.fs") | Is.EqualTo("out\\sub\\foo.proto.gen.fs"));
         }
 
@@ -59,7 +59,7 @@ namespace Grpc.Tools.Tests
                 "ProtoRoot", @"C:\Users\mciccotti\.nuget\packages\fsgrpc.tools\1.0.0\build\native\include\google\protobuf\".Replace('\\', System.IO.Path.DirectorySeparatorChar)
                 );
             var poss = _generator.GetPossibleOutputs(item);
-            Assert.AreEqual(1, poss.Length);
+            Assert.That(1, Is.EqualTo(poss.Length));
             Assert.That(poss[0], Is.EqualTo("obj/Debug/net7.0/descriptor.proto.gen.fs") | Is.EqualTo("obj\\Debug\\net7.0\\descriptor.proto.gen.fs"));
         }
     };

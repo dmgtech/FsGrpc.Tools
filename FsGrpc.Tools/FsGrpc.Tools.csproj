@@ -74,7 +74,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework; Microsoft.Build.Utilities.Core" Version="17.9.*" PrivateAssets="all" ExcludeAssets="Runtime" />
     <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="FsGrpc.ProtocGenFsGrpc" Version="0.6.0" PrivateAssets="All" />
+    <PackageReference Include="FsGrpc.ProtocGenFsGrpc" Version="0.6.2" PrivateAssets="All" />
 
     <PackageReference Include="fsgrpc" Version="1.0.6" />
     <PackageReference Include="Focal.Core" Version="0.10.0" />
@@ -83,6 +83,6 @@
     <None Include="$(OutputPath)\$(AssemblyName).deps.json" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
     <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
     <None Include="$(NugetPackageRoot)\medalliontopologicalsort\1.0.0\lib\netstandard2.0\MedallionTopologicalSort.dll" Pack="true" PackagePath="build\_protobuf\net6.0" Visible="false" />
-    <None Include="$(NugetPackageRoot)\fsgrpc.protocgenfsgrpc\0.6.0\tools\**\*" Pack="true" PackagePath="tools\" Visible="false" />
+    <None Include="$(NugetPackageRoot)\fsgrpc.protocgenfsgrpc\0.6.2\tools\**\*" Pack="true" PackagePath="tools\" Visible="false" />
   </ItemGroup>
 </Project>

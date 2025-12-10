@@ -3,6 +3,7 @@ name: dotnet package
 on:
   push:
     tags: [v*.*]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,21 +21,32 @@ jobs:
         uses: actions/setup-dotnet@v2.0.0
         with:
           dotnet-version: ${{ matrix.dotnet-version }}.x
+      - name: Authenticate to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          dotnet nuget add source "https://nuget.pkg.github.com/dmgtech/index.json" \
+            --name github \
+            --username "${{ github.actor }}" \
+            --password "$GITHUB_TOKEN" \
+            --store-password-in-clear-text
       - name: Display version
         run: dotnet --version
-      - name: Install dependencies
-        run: dotnet restore
+      - name: Install dependencies (restore via GitHub feed)
+        env:
+          NUGET_AUTH_TOKEN: ${{ github.token }}
+        run: dotnet restore --source https://nuget.pkg.github.com/dmgtech/index.json --source https://api.nuget.org/v3/index.json
       - name: Build
         run: dotnet build --configuration Release --no-restore
       - name: Package
         env:
           FSGRPCTOOLS_VERSION: ${{github.ref_name}}
         run: dotnet pack -p:FSGRPCTOOLS_VERSION=${FSGRPCTOOLS_VERSION#v} --no-restore --no-build --configuration Release
-      - name: Nuget Push
+      - name: Nuget Push (GitHub Packages)
         env:
           FSGRPCTOOLS_VERSION: ${{github.ref_name}}
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
-        run: dotnet nuget push bin/Release/FsGrpc.Tools.${FSGRPCTOOLS_VERSION#v}.nupkg --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          GITHUB_TOKEN: ${{ github.token }}
+        run: dotnet nuget push bin/Release/FsGrpc.Tools.${FSGRPCTOOLS_VERSION#v}.nupkg --api-key "$GITHUB_TOKEN" --source https://nuget.pkg.github.com/dmgtech/index.json --skip-duplicate
       - name: GitHubRelease
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')

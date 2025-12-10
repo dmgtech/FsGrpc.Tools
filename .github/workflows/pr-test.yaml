@@ -4,6 +4,12 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -16,12 +22,23 @@ jobs:
         uses: actions/setup-dotnet@v2.0.0
         with:
           dotnet-version: ${{ matrix.dotnet-version }}.x
+      - name: Authenticate to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          dotnet nuget add source "https://nuget.pkg.github.com/dmgtech/index.json" \
+            --name github \
+            --username "${{ github.actor }}" \
+            --password "$GITHUB_TOKEN" \
+            --store-password-in-clear-text
       - name: Display version
         run: dotnet --version
       - name: Gather projects
         run: rm -f fsgrpc.tools-ci.sln && dotnet new sln -n fsgrpc.tools-ci && dotnet sln fsgrpc.tools-ci.sln add `find . -type f -name '*.csproj'` --in-root
-      - name: Install dependencies
-        run: dotnet restore fsgrpc.tools-ci.sln
+      - name: Install dependencies (restore via GitHub feed)
+        env:
+          NUGET_AUTH_TOKEN: ${{ github.token }}
+        run: dotnet restore fsgrpc.tools-ci.sln --source https://nuget.pkg.github.com/dmgtech/index.json --source https://api.nuget.org/v3/index.json
       - name: Build
         run: dotnet build --configuration Release --no-restore
       - name: Test

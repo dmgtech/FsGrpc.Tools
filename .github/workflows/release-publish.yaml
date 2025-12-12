@@ -45,7 +45,7 @@ jobs:
       - name: Package
         env:
           FSGRPCTOOLS_VERSION: ${{github.ref_name}}
-        run: dotnet pack -p:FSGRPCTOOLS_VERSION=${FSGRPCTOOLS_VERSION#v} --no-restore --no-build --configuration Release
+        run: dotnet pack -p:FSGRPCTOOLS_VERSION=${FSGRPCTOOLS_VERSION#v} --no-restore --configuration Release
       - name: Nuget Push (GitHub Packages)
         env:
           FSGRPCTOOLS_VERSION: ${{github.ref_name}}

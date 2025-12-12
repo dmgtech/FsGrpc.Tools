@@ -55,7 +55,7 @@
   </ItemGroup>
 
   <ItemGroup Label="NuGet package assets">
-    <None Pack="true" PackagePath="build\" Include="build\**\*.xml; build\**\*.props; build\**\*.targets;" />
+    <None Pack="true" PackagePath="build" Include="build\**\*.xml; build\**\*.props; build\**\*.targets;" />
 
     <!-- Protobuf assets (for Google.Protobuf.Tools) -->
     <_ProtoAssetName Include="any;api;descriptor;duration;empty;field_mask;&#xA;                              source_context;struct;timestamp;type;wrappers" />
@@ -82,9 +82,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Place built task assembly under net8.0 only -->
-    <None Include="$(OutputPath)net8.0\$(AssemblyName).deps.json" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
-    <None Include="$(OutputPath)net8.0\$(AssemblyName).dll" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
+    <!-- OutputPath for SDK-style defaults to bin/<Config>/<TFM>/, so including net8.0 again doubles it. Use $(OutputPath) directly. -->
+    <None Include="$(OutputPath)$(AssemblyName).deps.json" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
+    <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
     <None Include="$(NugetPackageRoot)\medalliontopologicalsort\1.0.0\lib\netstandard2.0\MedallionTopologicalSort.dll" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
     <None Include="$(NugetPackageRoot)\fsgrpc.protocgenfsgrpc\0.6.2\tools\**\*" Pack="true" PackagePath="tools\" Visible="false" />
   </ItemGroup>

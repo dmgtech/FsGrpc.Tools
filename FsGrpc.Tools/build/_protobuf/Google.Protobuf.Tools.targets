@@ -7,8 +7,8 @@
     <!-- Configuration is passing the smoke test. -->
     <Protobuf_ProjectSupported Condition=" '$(Protobuf_Generator)' != '' ">true</Protobuf_ProjectSupported>
     <!-- Allow assembly file to be specified externally for testing by setting property _Protobuf_MsBuildAssembly -->
-    <_Protobuf_MsBuildAssembly Condition=" '$(_Protobuf_MsBuildAssembly)' == '' and Exists('net8.0\Protobuf.MSBuild.dll') ">net8.0\Protobuf.MSBuild.dll</_Protobuf_MsBuildAssembly>
-    <_Protobuf_MsBuildAssembly Condition=" '$(_Protobuf_MsBuildAssembly)' == '' and Exists('net6.0\Protobuf.MSBuild.dll') ">net6.0\Protobuf.MSBuild.dll</_Protobuf_MsBuildAssembly>
+    <_Protobuf_MsBuildAssembly Condition=" '$(_Protobuf_MsBuildAssembly)' == '' and Exists('$(MSBuildThisFileDirectory)net8.0\Protobuf.MSBuild.dll') ">$(MSBuildThisFileDirectory)net8.0\Protobuf.MSBuild.dll</_Protobuf_MsBuildAssembly>
+    <_Protobuf_MsBuildAssembly Condition=" '$(_Protobuf_MsBuildAssembly)' == '' and Exists('$(MSBuildThisFileDirectory)net6.0\Protobuf.MSBuild.dll') ">$(MSBuildThisFileDirectory)net6.0\Protobuf.MSBuild.dll</_Protobuf_MsBuildAssembly>
   </PropertyGroup>
 
   <UsingTask AssemblyFile="$(_Protobuf_MsBuildAssembly)" TaskName="Grpc.Tools.ProtoToolsPlatform" />

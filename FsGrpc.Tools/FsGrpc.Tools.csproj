@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>Protobuf.MSBuild</AssemblyName>
     <VersionPrefix>$(FSGRPCTOOLS_VERSION)$(VersionSuffix)</VersionPrefix>
-    <!-- If changing targets, change also paths in Google.Protobuf.Tools.targets. -->
+    <!-- If changing target frameworks, ensure that all corresponding framework paths are updated in Google.Protobuf.Tools.targets, as the targets file dynamically selects between assemblies for each framework. -->
     <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>

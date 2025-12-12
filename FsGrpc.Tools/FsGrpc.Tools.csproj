@@ -2,9 +2,10 @@
   <PropertyGroup>
     <AssemblyName>Protobuf.MSBuild</AssemblyName>
     <VersionPrefix>$(FSGRPCTOOLS_VERSION)$(VersionSuffix)</VersionPrefix>
-    <!-- If changing target frameworks, ensure that all corresponding framework paths are updated in Google.Protobuf.Tools.targets, as the targets file dynamically selects between assemblies for each framework. -->
-    <TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+    <!-- Target .NET 8 only; update targets file paths accordingly. -->
+    <TargetFramework>net8.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <!--Import Project="SourceLink.csproj.include" /-->
@@ -70,25 +71,21 @@
     <None Include="@(_Asset)" Pack="true" Visible="false" />
   </ItemGroup>
 
-  <!-- Common task-related packages across TFMs -->
+  <!-- Common task-related packages -->
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework; Microsoft.Build.Utilities.Core" Version="17.9.*" PrivateAssets="all" ExcludeAssets="Runtime" />
     <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="FsGrpc.ProtocGenFsGrpc" Version="0.6.2" PrivateAssets="All" />
-  </ItemGroup>
-
-  <!-- Packages only compatible with net8.0 -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
     <PackageReference Include="fsgrpc" Version="1.1.0" />
     <PackageReference Include="Focal.Core" Version="0.10.0" />
     <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.62.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Place built task assemblies under both TFMs for multi-targeting; use OutputPath+TargetFramework to locate compiled outputs -->
-    <None Include="$(OutputPath)$(TargetFramework)\$(AssemblyName).deps.json" Pack="true" PackagePath="build\_protobuf\$(TargetFramework)" Visible="false" />
-    <None Include="$(OutputPath)$(TargetFramework)\$(AssemblyName).dll" Pack="true" PackagePath="build\_protobuf\$(TargetFramework)" Visible="false" />
-    <None Include="$(NugetPackageRoot)\medalliontopologicalsort\1.0.0\lib\netstandard2.0\MedallionTopologicalSort.dll" Pack="true" PackagePath="build\_protobuf\$(TargetFramework)" Visible="false" />
+    <!-- Place built task assembly under net8.0 only -->
+    <None Include="$(OutputPath)net8.0\$(AssemblyName).deps.json" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
+    <None Include="$(OutputPath)net8.0\$(AssemblyName).dll" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
+    <None Include="$(NugetPackageRoot)\medalliontopologicalsort\1.0.0\lib\netstandard2.0\MedallionTopologicalSort.dll" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
     <None Include="$(NugetPackageRoot)\fsgrpc.protocgenfsgrpc\0.6.2\tools\**\*" Pack="true" PackagePath="tools\" Visible="false" />
   </ItemGroup>
 </Project>

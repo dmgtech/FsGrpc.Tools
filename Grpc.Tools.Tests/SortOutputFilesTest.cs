@@ -3,6 +3,7 @@ using Microsoft.Build.Utilities;
 
 namespace Grpc.Tools.Tests
 {
+    [TestFixture]
     public class SortOutputFilesTest
     {
         [Test]

@@ -24,6 +24,7 @@ using NUnit.Framework.Legacy;
 
 namespace Grpc.Tools.Tests
 {
+    [TestFixture]
     public class DepFileUtilTest
     {
 

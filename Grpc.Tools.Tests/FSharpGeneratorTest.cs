@@ -21,6 +21,7 @@ using Microsoft.Build.Utilities;
 
 namespace Grpc.Tools.Tests
 {
+    [TestFixture]
     public class CSharpGeneratorTest
     {
         FSharpGeneratorServices _generator;

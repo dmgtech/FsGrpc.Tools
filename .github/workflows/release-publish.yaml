@@ -38,6 +38,7 @@ jobs:
         run: dotnet --version
       - name: Install dependencies (restore via GitHub feed)
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           NUGET_AUTH_TOKEN: ${{ github.token }}
         run: dotnet restore --source https://nuget.pkg.github.com/dmgtech/index.json --source https://api.nuget.org/v3/index.json
       - name: Build

@@ -16,9 +16,6 @@ jobs:
     strategy:
       matrix:
         dotnet-version: ['8.0']
-    env:
-      GITHUB_TOKEN: ${{ github.token }}
-      DOTNET_NUGET_AUTH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v2
 
@@ -28,6 +25,8 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}.x
 
       - name: Authenticate to GitHub Packages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           dotnet nuget add source "https://nuget.pkg.github.com/dmgtech/index.json" \
             --name github \
@@ -43,6 +42,9 @@ jobs:
         run: rm -f fsgrpc.tools-ci.sln && dotnet new sln -n fsgrpc.tools-ci && dotnet sln fsgrpc.tools-ci.sln add `find . -type f -name '*.csproj'` --in-root
 
       - name: Install dependencies (restore via GitHub feed)
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          NUGET_AUTH_TOKEN: ${{ github.token }}
         run: dotnet restore fsgrpc.tools-ci.sln --source https://nuget.pkg.github.com/dmgtech/index.json --source https://api.nuget.org/v3/index.json
 
       - name: Build

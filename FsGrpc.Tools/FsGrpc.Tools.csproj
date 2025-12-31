@@ -75,7 +75,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework; Microsoft.Build.Utilities.Core" Version="17.9.*" PrivateAssets="all" ExcludeAssets="Runtime" />
     <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" PrivateAssets="All" />
-    <PackageReference Include="FsGrpc.ProtocGenFsGrpc" Version="0.6.2" PrivateAssets="All" />
+    <PackageReference Include="FsGrpc.ProtocGenFsGrpc" Version="0.8.1" PrivateAssets="All" />
     <PackageReference Include="fsgrpc" Version="1.1.0" />
     <PackageReference Include="Focal.Core" Version="0.10.0" />
     <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.62.0" />

@@ -2,10 +2,11 @@
   <PropertyGroup>
     <AssemblyName>Protobuf.MSBuild</AssemblyName>
     <VersionPrefix>$(FSGRPCTOOLS_VERSION)$(VersionSuffix)</VersionPrefix>
-    <!-- Target .NET 8 only; update targets file paths accordingly. -->
-    <TargetFramework>net8.0</TargetFramework>
+    <!-- MSBuild tasks should target netstandard2.0 for compatibility with MSBuild hosts -->
+    <TargetFramework>netstandard2.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <!--Import Project="SourceLink.csproj.include" /-->
@@ -43,7 +44,7 @@
     <PackageProjectUrl>https://github.com/grpc/grpc</PackageProjectUrl>
     <PackageTags>gRPC RPC HTTP/2</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-	  <GenerateDependencyFile>true</GenerateDependencyFile>
+	  <GenerateDependencyFile>false</GenerateDependencyFile>
     <!-- This property tells MSBuild where the root folder of the package's build assets should be. Because we are not a library package, we should not pack to 'lib'. Instead, we choose 'tasks' by convention. -->
     <!-- NuGet does validation that libraries in a package are exposed as dependencies, but we _explicitly_ do not want that behavior for MSBuild tasks. They are isolated by design. Therefore we ignore this specific warning. -->
     <NoWarn>$(NoWarn);NU5128</NoWarn>
@@ -76,17 +77,12 @@
     <PackageReference Include="Microsoft.Build.Framework; Microsoft.Build.Utilities.Core" Version="17.9.*" PrivateAssets="all" ExcludeAssets="Runtime" />
     <PackageReference Include="MedallionTopologicalSort" Version="1.0.0" PrivateAssets="All" />
     <PackageReference Include="FsGrpc.ProtocGenFsGrpc" Version="0.8.1" PrivateAssets="All" />
-    <PackageReference Include="fsgrpc" Version="1.1.0" />
-    <PackageReference Include="Focal.Core" Version="0.10.0" />
-    <PackageReference Include="Grpc.AspNetCore.Server.ClientFactory" Version="2.62.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- OutputPath for SDK-style defaults to bin/<Config>/<TFM>/, so including net8.0 again doubles it. Use $(OutputPath) directly. -->
-    <None Include="$(OutputPath)$(AssemblyName).deps.json" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
-    <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
-    <None Include="build\_protobuf\net8.0\Protobuf.MSBuild.runtimeconfig.json" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
-    <None Include="$(NugetPackageRoot)\medalliontopologicalsort\1.0.0\lib\netstandard2.0\MedallionTopologicalSort.dll" Pack="true" PackagePath="build\_protobuf\net8.0" Visible="false" />
+    <!-- OutputPath for SDK-style defaults to bin/<Config>/<TFM>/, so package to netstandard2.0 subdirectory. -->
+    <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="build\_protobuf\netstandard2.0" Visible="false" />
+    <None Include="$(NugetPackageRoot)\medalliontopologicalsort\1.0.0\lib\netstandard2.0\MedallionTopologicalSort.dll" Pack="true" PackagePath="build\_protobuf\netstandard2.0" Visible="false" />
     <None Include="$(NugetPackageRoot)\fsgrpc.protocgenfsgrpc\0.8.1\tools\**\*" Pack="true" PackagePath="tools\" Visible="false" />
   </ItemGroup>
 </Project>

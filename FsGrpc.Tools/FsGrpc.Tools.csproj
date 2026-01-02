@@ -6,7 +6,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <LangVersion>latest</LangVersion>
+    <!-- Use C# 7.3 which is the highest version fully supported by netstandard2.0 -->
+    <LangVersion>7.3</LangVersion>
   </PropertyGroup>
 
   <!--Import Project="SourceLink.csproj.include" /-->

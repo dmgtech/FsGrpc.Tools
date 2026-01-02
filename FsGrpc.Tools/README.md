@@ -13,9 +13,26 @@ and gRPC service stubs from `.proto` files. These files:
 This package is optional. You may instead choose to generate the C# source files from
 `.proto` files by running the `protoc` compiler manually or from a script.
 
+## Target Framework and Compatibility
+
+**This is a build-time only package.** The MSBuild tasks in this package target `netstandard2.0` for maximum compatibility with different MSBuild hosts. This means:
+
+- **Not a runtime dependency**: Your application does not reference or use this assembly at runtime
+- **Build-time execution only**: The assembly is loaded by MSBuild during build to generate code from `.proto` files
+- **Wide compatibility**: Works with all MSBuild hosts that support netstandard2.0:
+  - Visual Studio 2017+ (all editions)
+  - .NET Framework 4.7.2+ projects
+  - .NET Core 2.0+ projects
+  - .NET 5+ projects
+  - .NET 6+ projects
+  - .NET 8+ projects
+  - Command-line `dotnet build` and `msbuild` on all platforms
+
+**Your consuming application** can target any framework - the build tools target is independent of your project's target framework.
+
 ## Simple example
 
-To add a `.proto` file to a project edit the project’s `.csproj` file and add an item group with a `<Protobuf>` element that refers to the `.proto` file, e.g.
+To add a `.proto` file to a project edit the project's `.csproj` file and add an item group with a `<Protobuf>` element that refers to the `.proto` file, e.g.
 
 ```xml
 <ItemGroup>

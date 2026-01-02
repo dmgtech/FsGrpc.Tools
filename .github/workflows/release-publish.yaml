@@ -49,7 +49,7 @@ jobs:
           echo "Project directory contents:" && ls -la
           echo "bin contents:" && ls -la bin || true
           echo "bin/Release contents:" && ls -la bin/Release || true
-          echo "bin/Release/net8.0 contents:" && ls -la bin/Release/net8.0 || true
+          echo "bin/Release/netstandard2.0 contents:" && ls -la bin/Release/netstandard2.0 || true
           echo "Find task artifacts:" && find bin -maxdepth 3 -type f -name 'Protobuf.MSBuild*' -print || true
       - name: Show evaluated pack Include items
         run: |
@@ -58,7 +58,7 @@ jobs:
           echo "Dump glob of csproj for Include paths:" && grep -n "None Include=\"\$(OutputPath)\$(TargetFramework)\\\$(AssemblyName)\"" -n FsGrpc.Tools.csproj || true
       - name: Verify artifacts exist
         run: |
-          test -f bin/Release/net8.0/Protobuf.MSBuild.deps.json || (echo "Missing net8.0 deps.json" && exit 1)
+          test -f bin/Release/netstandard2.0/Protobuf.MSBuild.dll || (echo "Missing netstandard2.0 Protobuf.MSBuild.dll" && exit 1)
       - name: Package
         env:
           FSGRPCTOOLS_VERSION: ${{github.ref_name}}
